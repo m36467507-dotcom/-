@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Basant</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif}
+  .container{width:100%;max-width:390px;height:720px;background:#000;border-radius:22px;position:relative;overflow:hidden;text-align:center;color:#fff}
+
+  #lock{position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, #5a0f1e 0%, #160309 70%);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px}
+  #lock.hide{display:none}
+  .lock-icon{width:72px;height:72px;background:#e8c27a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:20px}
+  .lock-title{font-size:30px;color:#f0d48a;font-style:italic;margin-bottom:8px}
+  .lock-sub{color:#ffb3b3;font-size:12px;letter-spacing:3px;margin-bottom:28px}
+  .pass-input{width:100%;max-width:260px;padding:14px 18px;border-radius:30px;border:1px solid #e8c27a;background:rgba(255,255,255,.08);color:#fff;font-size:17px;text-align:center;outline:none}
+  .pass-btn{margin-top:16px;background:#e8c27a;color:#222;border:none;padding:13px 42px;border-radius:30px;font-size:16px;font-weight:bold;cursor:pointer}
+  .pass-error{color:#ff8a8a;font-size:13px;margin-top:12px;min-height:18px}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .shake{animation:shake .3s}
+
+  .page{display:none;height:100%;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:2}
+  .page:target{display:flex}
+  #p1{display:flex}
+  .page:target ~ #p1{display:none}
+  .p1-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, #5a0f1e 0%, #26050e 70%)}
+  .small{font-size:12px;letter-spacing:5px;color:#ffb3b3;position:relative}
+  .gold{color:#f0d48a;font-style:italic;font-size:54px;margin:10px 0 28px;position:relative}
+  .env-check{display:none}
+  .envelope{width:330px;height:218px;position:relative;cursor:pointer;display:block;filter:drop-shadow(0 28px 32px rgba(0,0,0,.6));z-index:2}
+  .env-body{position:absolute;inset:0;background:linear-gradient(160deg,#c22a3e 0%,#8a1626 45%,#5c0d1a 100%);border-radius:18px}
+  .env-lines{position:absolute;inset:0;z-index:2;background:linear-gradient(to right bottom, transparent calc(50% - 1px), rgba(255,255,255,.22) calc(50% - 1px), rgba(255,255,255,.22) calc(50% + 1px), transparent calc(50% + 1px)),linear-gradient(to left bottom, transparent calc(50% - 1px), rgba(0,0,0,.18) calc(50% - 1px), rgba(0,0,0,.18) calc(50% + 1px), transparent calc(50% + 1px));border-radius:18px}
+  .env-letter{position:absolute;top:8px;left:14px;width:302px;height:200px;background:linear-gradient(180deg,#fffdf5,#fff0c9);border-radius:10px;z-index:3;transition:.9s;padding:18px;color:#333;font-size:15px;line-height:1.65;text-align:left;border:1px solid #e8c27a;display:flex;flex-direction:column;justify-content:center}
+  .env-letter b{color:#a3182e;font-size:16px}
+  .env-letter .line{height:1px;background:#e8c27a;margin:10px 0}
+  .env-pocket{position:absolute;bottom:0;left:0;width:100%;height:142px;background:linear-gradient(180deg,#b01f33,#6e1020);z-index:4;clip-path:polygon(0 0,50% 62%,100% 0,100% 100%,0 100%);border-radius:0 0 18px 18px}
+  .env-flap{position:absolute;top:0;left:0;width:100%;height:122px;background:linear-gradient(180deg,#e03a4f,#9e1a2e);clip-path:polygon(0 0,100% 0,50% 100%);z-index:5;transform-origin:top;transition:.9s;border-radius:18px 18px 0 0}
+  .stamp{position:absolute;top:10px;right:12px;width:38px;height:46px;background:#fff8e7;border:2px dashed #c22a3e;border-radius:4px;z-index:6;display:flex;align-items:center;justify-content:center;font-size:18px;transform:rotate(4deg)}
+  .seal{position:absolute;top:96px;left:50%;transform:translateX(-50%);width:74px;height:74px;background:radial-gradient(circle at 32% 28%, #fff6b5, #f0d48a 35%, #d4af37 55%, #9c7a00 85%, #6e5500 100%);border-radius:50%;z-index:7;display:flex;align-items:center;justify-content:center;transition:.3s}
+  .seal::before{content:"";position:absolute;inset:6px;border:1.5px dashed rgba(122,18,32,.5);border-radius:50%}
+  .seal svg{width:34px;height:32px}
+  .env-check:checked + .envelope .env-flap{transform:rotateX(180deg);z-index:1}
+  .env-check:checked + .envelope .env-letter{transform:translateY(-42px);z-index:6}
+  .env-check:checked + .envelope .seal{opacity:0;transform:translateX(-50%) scale(.3)}
+  .hint{margin-top:16px;color:#ffcccc;font-size:12px;letter-spacing:1px;position:relative}
+
+  .photo-page{position:absolute;inset:0}
+  .photo-page img{width:100%;height:100%;object-fit:cover;animation:slowZoom 12s ease-in-out infinite alternate}
+  @keyframes slowZoom{from{transform:scale(1)}to{transform:scale(1.08)}}
+  .warm img{filter:brightness(1.18) contrast(1.06) saturate(1.18) sepia(.18)}
+  .warm::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,180,80,.12), transparent 40%, rgba(255,140,0,.10));z-index:2;pointer-events:none}
+  .photo-page::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, transparent 30%, transparent 45%, rgba(0,0,0,.75) 78%, rgba(0,0,0,.92) 100%);z-index:3}
+  .top-bar{position:absolute;top:18px;left:18px;right:18px;display:flex;gap:6px;z-index:5}
+  .top-bar i{height:3px;flex:1;background:rgba(255,255,255,.35);border-radius:99px;overflow:hidden;display:block}
+  .top-bar i b{display:block;height:100%;background:#fff;border-radius:99px}
+  .photo-content{position:absolute;left:22px;right:22px;bottom:88px;z-index:5;text-align:left;animation:up 1s ease both}
+  @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .photo-content .kicker{font-size:11px;letter-spacing:4px;color:#f0d48a;margin-bottom:8px}
+  .photo-content h2{font-size:32px;line-height:1.15;font-weight:normal;margin-bottom:10px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .photo-content p{font-size:15.5px;line-height:1.7;color:rgba(255,255,255,.92);text-shadow:0 1px 8px rgba(0,0,0,.6);max-width:300px}
+  .nav-row{position:absolute;left:22px;right:22px;bottom:28px;z-index:6;display:flex;justify-content:space-between;align-items:center}
+  .nav-row a{color:#fff;text-decoration:none;font-size:14px;letter-spacing:1px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);padding:11px 20px;border-radius:30px;border:1px solid rgba(255,255,255,.35)}
+  .nav-row a.main{background:#fff;color:#111;border:none;font-weight:bold}
+  .music-btn{position:absolute;top:14px;right:14px;z-index:20;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:16px;cursor:pointer;backdrop-filter:blur(6px)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- الأغنية - ملف بره -->
+  <audio id="song" src="song.mp3" loop preload="auto"></audio>
+  <button class="music-btn" id="musicBtn" title="Music">🎵</button>
+
+  <div id="lock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">For Basant Only</div>
+    <div class="lock-sub">ENTER THE PASSWORD</div>
+    <input type="password" id="passInput" class="pass-input" placeholder="اكتبي الباسورد هنا">
+    <button class="pass-btn" id="passBtn">Open</button>
+    <div class="pass-error" id="passError"></div>
+  </div>
+
+  <div class="page" id="p1">
+    <div class="p1-bg"></div>
+    <div class="small">FOR BASANT</div>
+    <div class="gold">Open it</div>
+    <input type="checkbox" id="openEnv" class="env-check">
+    <label for="openEnv" class="envelope">
+      <div class="env-body"></div><div class="env-lines"></div><div class="stamp">✉️</div>
+      <div class="env-letter"><b>For Basant ❤️</b><div class="line"></div>On this special day I just wanna tell u ur the best person In my life I love you forever</div>
+      <div class="env-pocket"></div><div class="env-flap"></div>
+      <div class="seal"><svg viewBox="0 0 24 22"><path d="M12 20C12 20 2 13.5 2 7.5C2 4.5 4.5 2 7.2 2C9 2 10.8 3 12 4.8C13.2 3 15 2 16.8 2C19.5 2 22 4.5 22 7.5C22 13.5 12 20 12 20Z" fill="#8a0f1f"/></svg></div>
+    </label>
+    <div class="hint">TAP THE ENVELOPE</div>
+    <a href="#p2" style="position:relative;z-index:3;margin-top:18px;background:#e8c27a;color:#1e0a0e;text-decoration:none;padding:13px 40px;border-radius:30px;font-weight:bold">Next</a>
+  </div>
+
+  <div class="page" id="p2">
+    <div class="photo-page warm"><img src="photo1.jpg" alt="Basant"></div>
+    <div class="top-bar"><i><b style="width:100%"></b></i><i></i><i></i></div>
+    <div class="photo-content">
+      <div class="kicker">01 • FOR YOU</div>
+      <h2>My favorite<br>person</h2>
+      <p>You are the best person in my life. I love you forever.</p>
+    </div>
+    <div class="nav-row"><a href="#p1">Back</a><a href="#p3" class="main">Next →</a></div>
+  </div>
+
+  <div class="page" id="p3">
+    <div class="photo-page"><img src="photo2.jpg" alt="Basant"></div>
+    <div class="top-bar"><i><b style="width:100%"></b></i><i><b style="width:100%"></b></i><i></i></div>
+    <div class="photo-content">
+      <div class="kicker">02 • ONE YEAR</div>
+      <h2>1 year<br>with you</h2>
+      <p>Not just days. 1 year with you, and still you are my favorite person. I never forgot the first day I met you.</p>
+    </div>
+    <div class="nav-row"><a href="#p2">Back</a><a href="#p4" class="main">Next →</a></div>
+  </div>
+
+  <div class="page" id="p4">
+    <div class="photo-page"><img src="photo3.jpg" alt="Basant"></div>
+    <div class="top-bar"><i><b style="width:100%"></b></i><i><b style="width:100%"></b></i><i><b style="width:100%"></b></i></div>
+    <div class="photo-content">
+      <div class="kicker">03 • ALWAYS</div>
+      <h2>Always<br>you</h2>
+      <p>And my love grows every day. I want many more years with you, always you.</p>
+    </div>
+    <div class="nav-row"><a href="#p3">Back</a><a href="#p1" class="main">Replay ↺</a></div>
+  </div>
+
+</div>
+<script>
+  function checkPass(){
+    var v = document.getElementById('passInput').value.trim();
+    if(v === 'بسنت' || v.toLowerCase() === 'basant'){ document.getElementById('lock').classList.add('hide'); }
+    else {
+      var inp = document.getElementById('passInput');
+      inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+      document.getElementById('passError').textContent = 'Wrong password, try again';
+      inp.value=''; inp.focus();
+    }
+  }
+  document.getElementById('passBtn').addEventListener('click', checkPass);
+  document.getElementById('passInput').addEventListener('keydown', function(e){ if(e.key==='Enter'){ checkPass(); } });
+
+  // الأغنية تشتغل لما تفتح الظرف
+  var song = document.getElementById('song');
+  var musicBtn = document.getElementById('musicBtn');
+  var isPlaying = false;
+  function playSong(){ song.play().then(function(){ isPlaying=true; musicBtn.textContent='⏸️'; }).catch(function(){}); }
+  function toggleSong(){ if(isPlaying){ song.pause(); isPlaying=false; musicBtn.textContent='🎵'; } else { playSong(); } }
+  document.getElementById('openEnv').addEventListener('change', function(){ if(this.checked){ playSong(); } });
+  musicBtn.addEventListener('click', toggleSong);
+</script>
+</body>
+</html>
